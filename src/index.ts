@@ -2,15 +2,16 @@ import express from "express";
 import { NextFunction, Request, Response } from "express";
 import "dotenv/config";
 import dotenv from "dotenv";
-import { router } from "./routes";
 import cors from "cors";
+import { userRouter } from "./routes/userRoutes";
 
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(router);
+
+app.use("/user", userRouter);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 	if (err instanceof Error) {

@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE  // Importante: Pagamento falhou, mas ainda não foi cancelado
+  UNPAID    // Pagamento falhou múltiplas vezes
+  TRIALING  // Se você oferecer período grátis
+  EXPIRED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  password  String   
+  stripeCustomerId String? @unique 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscription Subscription?
+  services Service[]
+  appointments Appointment[]
+
+  @@map("users")
+}
+
+model Service{
+  id String @id @default(uuid())
+  name String
+  description String?
+  price Float
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  service Appointment[]
+
+  @@map("haircuts")
+}
+
+model Appointment{
+  id String @id @default(uuid())
+  customerName String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  haircut Service @relation(fields: [serviceId], references: [id])
+  serviceId String
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  @@map("services")
+}
+
+model Subscription {
+  id        String             @id @default(uuid())
+  status    SubscriptionStatus @default(ACTIVE)  
+  stripeSubscriptionId String @unique 
+  stripePriceId        String         
+  currentPeriodEnd     DateTime 
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([stripeSubscriptionId]) 
+  @@map("subscriptions")
+}
+
