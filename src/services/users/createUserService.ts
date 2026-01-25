@@ -1,16 +1,24 @@
+import { createUserDto } from "../../schemas/createUserSchema";
 import { prisma } from "../../lib/prisma";
 
-export async function createUserService() {
-	const user = await prisma.user.create({
-		data: {
-			name: "Alice",
-			email: "alice@prisma.io",
-			password: "123",
-			phone: "123",
+import { AppError } from "../../utils/AppError";
+
+export async function createUserService(data: createUserDto) {
+	const existingUser = await prisma.user.findFirst({
+		where: {
+			email: data.email,
 		},
 	});
 
-	if (!user) return null;
+	if (existingUser) {
+		throw new AppError("Usuário já cadastrado", 409);
+	}
+
+	const user = await prisma.user.create({ data });
+
+	if (!user) {
+		throw new AppError("Erro ao criar usuário", 400);
+	}
 
 	return user;
 }
