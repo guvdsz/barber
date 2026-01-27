@@ -6,6 +6,10 @@ import cors from "cors";
 import { userRouter } from "./routes/userRoutes";
 import { AppError } from "./utils/AppError";
 import { authRouter } from "./routes/authRoutes";
+import { servicesRouter } from "./routes/serviceRoutes";
+import { subscriptionRouter } from "./routes/subscriptionRoutes";
+import { appointmentRouter } from "./routes/appointmentRoutes";
+import { validateAuth } from "./middlewares/validateAuth";
 
 const app = express();
 dotenv.config();
@@ -15,7 +19,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRouter);
-app.use("/user", userRouter);
+app.use("/user", validateAuth, userRouter);
+app.use("/service", validateAuth, servicesRouter);
+app.use("/subscription", validateAuth, subscriptionRouter);
+app.use("/appointment", validateAuth, appointmentRouter);
 
 app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
 	if (err instanceof AppError) {

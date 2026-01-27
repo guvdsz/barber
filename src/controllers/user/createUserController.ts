@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createUserService } from "../../services/users/createUserService";
+import { createUserService } from "../../services/user/createUserService";
 
 export async function createUserController(
 	req: Request,
@@ -8,7 +8,7 @@ export async function createUserController(
 ) {
 	try {
 		const response = await createUserService(req.body);
-		return res.json(response);
+		return res.status(201).json(response);
 	} catch (error) {
 		next(error);
 	}
