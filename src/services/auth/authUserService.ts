@@ -15,7 +15,7 @@ export async function authService(data: authDto) {
 	});
 
 	if (!existingUser) {
-		throw new AppError("Invalid credentials", 401);
+		throw new AppError("Credenciais inválidas", 401);
 	}
 
 	const isPasswordCorrect = await bcrypt.compare(
@@ -24,13 +24,14 @@ export async function authService(data: authDto) {
 	);
 
 	if (!isPasswordCorrect) {
-		throw new AppError("Invalid credentials", 401);
+		throw new AppError("Credenciais inválidas", 401);
 	}
 
 	const token = jsonwebtoken.sign(
 		{
 			name: existingUser.name,
 			email: existingUser.email,
+			tokenVersion: existingUser.tokenVersion,
 		},
 		process.env.JWT_SECRET as string,
 		{ subject: existingUser.id, expiresIn: "1d" },
@@ -42,6 +43,7 @@ export async function authService(data: authDto) {
 		email: existingUser.email,
 		phone: existingUser.phone,
 		token: token,
+		tokenVersion: existingUser.tokenVersion,
 		subscription: existingUser?.subscription
 			? {
 					id: existingUser.subscription.id,

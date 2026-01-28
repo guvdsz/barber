@@ -19,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRouter);
-app.use("/user", validateAuth, userRouter);
+app.use("/user", userRouter);
 app.use("/service", validateAuth, servicesRouter);
 app.use("/subscription", validateAuth, subscriptionRouter);
 app.use("/appointment", validateAuth, appointmentRouter);
@@ -31,7 +31,7 @@ app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
 		});
 	}
 	return res.status(500).json({
-		error: "Internal server error.",
+		error: "Erro interno no servidor. Tente novamente mais tarde.",
 	});
 });
 

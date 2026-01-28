@@ -10,7 +10,7 @@ export function validateResource(schema: ZodType) {
 			if (e instanceof ZodError) {
 				return res.status(400).json({
 					error: JSON.parse(e.message).map(
-						(e: any) => `${e.path[0]}: ${e.message}`,
+						(e: any) => `${e.message}`,
 					)[0],
 				});
 			}
